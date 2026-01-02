@@ -18,11 +18,11 @@ pub fn run(json: bool, config: &Config) -> Result<()> {
     let plugins_dir = Config::expand_path(&config.paths.plugins);
     let history_dir = Config::expand_path(&config.paths.history);
 
-    // Count plugins
+    // Count plugins (follow symlinks)
     let plugins_count = if plugins_dir.exists() {
         std::fs::read_dir(&plugins_dir)?
             .filter_map(|e| e.ok())
-            .filter(|e| e.file_type().map(|t| t.is_dir()).unwrap_or(false))
+            .filter(|e| e.path().is_dir()) // is_dir() follows symlinks
             .filter(|e| e.path().join("plugin.toml").exists())
             .count()
     } else {
@@ -53,11 +53,12 @@ pub fn run(json: bool, config: &Config) -> Result<()> {
         if plugins_count == 0 {
             println!("  {}", "(none)".dimmed());
         } else {
-            // TODO: List plugins with their contracts
             for entry in std::fs::read_dir(&plugins_dir)? {
                 let entry = entry?;
-                if entry.file_type()?.is_dir() {
-                    let manifest = entry.path().join("plugin.toml");
+                let path = entry.path();
+                if path.is_dir() {
+                    // is_dir() follows symlinks
+                    let manifest = path.join("plugin.toml");
                     if manifest.exists() {
                         let name = entry.file_name();
                         println!("  {} {}", "✓".green(), name.to_string_lossy());

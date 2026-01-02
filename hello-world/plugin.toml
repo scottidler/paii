@@ -1,0 +1,31 @@
+[plugin]
+name = "hello-world"
+version = "0.1.0"
+description = "A PAII skill plugin"
+authors = []
+language = "python"
+license = "MIT"
+
+[paii]
+core_version = ">=0.1.0"
+
+# Contracts this plugin provides
+[provides]
+
+# Contracts this plugin consumes (optional dependencies)
+[consumes]
+
+# Plugin configuration schema
+[config]
+
+# Hook subscriptions
+[hooks]
+pre_tool_use = false
+post_tool_use = false
+stop = false
+session_start = false
+session_end = false
+
+# Build configuration
+[build]
+type = "uv"

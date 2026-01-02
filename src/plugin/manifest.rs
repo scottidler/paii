@@ -135,7 +135,7 @@ pub struct BuildSpec {
 #[serde(rename_all = "lowercase")]
 pub enum BuildType {
     #[default]
-    Pip,
+    Uv,
     Cargo,
     Custom,
 }
