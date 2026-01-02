@@ -1,0 +1,28 @@
+[plugin]
+name = "python-coder"
+version = "0.1.0"
+description = "Python coding conventions using uv, ruff, and modern tooling"
+authors = ["Scott Idler <scott.a.idler@gmail.com>"]
+language = "mixed"
+license = "MIT"
+
+[paii]
+core_version = ">=0.1.0"
+
+[provides]
+skill = "python-coder"
+
+[consumes]
+
+[config]
+
+[hooks]
+pre_tool_use = false
+post_tool_use = false
+stop = false
+session_start = false
+session_end = false
+
+[build]
+type = "custom"
+

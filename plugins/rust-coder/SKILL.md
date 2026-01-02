@@ -215,17 +215,9 @@ otto cov     # Coverage report
 otto build   # Release build
 ```
 
-### Standard .otto.yml structure
+The scaffold tool generates `.otto.yml` automatically with standard tasks.
 
-The scaffold tool generates this automatically. Key tasks:
-
-- `lint` - Whitespace linting
-- `check` - cargo check + clippy + fmt check
-- `test` - cargo test
-- `cov` - Coverage via llvm-cov
-- `ci` - Runs lint, check, test in parallel
-- `build` - Release build
-- `install` - cargo install --path .
+**For detailed otto configuration, see the `otto` skill** — it covers `.otto.yml` syntax, parameters, dependencies, and templates.
 
 ## Testing Patterns
 

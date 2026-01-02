@@ -41,3 +41,23 @@ language = "mixed"
 type = "skill"
 tags = ["rust", "coding", "conventions", "cli"]
 
+[[plugins]]
+name = "otto"
+version = "0.1.0"
+description = "Otto task runner skill - Make replacement for builds and CI"
+source = "https://github.com/scottidler/paii"
+path = "plugins/otto"
+language = "mixed"
+type = "skill"
+tags = ["otto", "make", "build", "ci", "task-runner"]
+
+[[plugins]]
+name = "python-coder"
+version = "0.1.0"
+description = "Python coding conventions using uv, ruff, and modern tooling"
+source = "https://github.com/scottidler/paii"
+path = "plugins/python-coder"
+language = "mixed"
+type = "skill"
+tags = ["python", "coding", "conventions", "uv", "ruff"]
+
