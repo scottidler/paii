@@ -1,5 +1,35 @@
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
+use std::io::IsTerminal;
 use std::path::PathBuf;
+
+/// Output format for commands
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum OutputFormat {
+    /// Human-readable text
+    Text,
+    /// JSON format
+    Json,
+    /// YAML format
+    Yaml,
+}
+
+impl OutputFormat {
+    /// Resolve the effective output format.
+    /// If user specified a format, use it.
+    /// Otherwise: TTY → Text, non-TTY (pipe) → Json
+    pub fn resolve(user_choice: Option<OutputFormat>) -> OutputFormat {
+        match user_choice {
+            Some(fmt) => fmt,
+            None => {
+                if std::io::stdout().is_terminal() {
+                    OutputFormat::Text
+                } else {
+                    OutputFormat::Json
+                }
+            }
+        }
+    }
+}
 
 #[derive(Parser)]
 #[command(
@@ -86,9 +116,9 @@ pub enum Commands {
 
     /// Show system status
     Status {
-        /// Output as JSON
-        #[arg(long)]
-        json: bool,
+        /// Output format (default: text for TTY, json for pipes)
+        #[arg(long, short = 'o', value_enum)]
+        format: Option<OutputFormat>,
     },
 
     /// Generate shell completions
@@ -102,9 +132,9 @@ pub enum Commands {
 pub enum PluginAction {
     /// List installed plugins
     List {
-        /// Output as JSON
-        #[arg(long)]
-        json: bool,
+        /// Output format (default: text for TTY, json for pipes)
+        #[arg(long, short = 'o', value_enum)]
+        format: Option<OutputFormat>,
     },
 
     /// Install a plugin
@@ -207,9 +237,9 @@ pub enum HistoryAction {
         #[arg(long)]
         since: Option<String>,
 
-        /// Output as JSON
-        #[arg(long)]
-        json: bool,
+        /// Output format (default: text for TTY, json for pipes)
+        #[arg(long, short = 'o', value_enum)]
+        format: Option<OutputFormat>,
     },
 
     /// Show recent entries
@@ -231,9 +261,9 @@ pub enum HistoryAction {
 pub enum ConfigAction {
     /// Show current configuration
     Show {
-        /// Output as JSON
-        #[arg(long)]
-        json: bool,
+        /// Output format (default: text for TTY, json for pipes)
+        #[arg(long, short = 'o', value_enum)]
+        format: Option<OutputFormat>,
     },
 
     /// Get a configuration value
@@ -283,8 +313,18 @@ pub enum RegistryAction {
         /// Search query (matches name, description, tags)
         query: String,
 
-        /// Output as JSON
-        #[arg(long)]
-        json: bool,
+        /// Output format (default: text for TTY, json for pipes)
+        #[arg(long, short = 'o', value_enum)]
+        format: Option<OutputFormat>,
+    },
+
+    /// Show all plugins in a cached registry
+    Show {
+        /// Registry name
+        name: String,
+
+        /// Output format (default: text for TTY, json for pipes)
+        #[arg(long, short = 'o', value_enum)]
+        format: Option<OutputFormat>,
     },
 }

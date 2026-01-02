@@ -1,8 +1,9 @@
 use chrono::NaiveDate;
 use colored::*;
 use eyre::{Context, Result};
+use serde::Serialize;
 
-use crate::cli::HistoryAction;
+use crate::cli::{HistoryAction, OutputFormat};
 use crate::config::Config;
 use crate::history::HistoryStore;
 
@@ -13,11 +14,27 @@ pub fn run(action: HistoryAction, config: &Config) -> Result<()> {
             category,
             limit,
             since,
-            json,
-        } => query_history(&query, category.as_deref(), limit, since.as_deref(), json, config),
+            format,
+        } => query_history(
+            &query,
+            category.as_deref(),
+            limit,
+            since.as_deref(),
+            OutputFormat::resolve(format),
+            config,
+        ),
         HistoryAction::Recent { category, count } => recent(category.as_deref(), count, config),
         HistoryAction::Categories => categories(config),
     }
+}
+
+#[derive(Serialize)]
+struct HistoryEntryOutput {
+    id: String,
+    category: String,
+    title: String,
+    created_at: String,
+    tags: Vec<String>,
 }
 
 fn query_history(
@@ -25,7 +42,7 @@ fn query_history(
     category: Option<&str>,
     limit: usize,
     since: Option<&str>,
-    json: bool,
+    format: OutputFormat,
     config: &Config,
 ) -> Result<()> {
     let history_dir = Config::expand_path(&config.paths.history);
@@ -39,34 +56,39 @@ fn query_history(
 
     let entries = store.query(query, category, since_date, limit)?;
 
-    if json {
-        let output: Vec<serde_json::Value> = entries
-            .iter()
-            .map(|e| {
-                serde_json::json!({
-                    "id": e.id,
-                    "category": e.category,
-                    "title": e.title,
-                    "created_at": e.created_at.format("%Y-%m-%dT%H:%M:%S%z").to_string(),
-                    "tags": e.tags,
+    match format {
+        OutputFormat::Json | OutputFormat::Yaml => {
+            let output: Vec<HistoryEntryOutput> = entries
+                .iter()
+                .map(|e| HistoryEntryOutput {
+                    id: e.id.clone(),
+                    category: e.category.clone(),
+                    title: e.title.clone(),
+                    created_at: e.created_at.format("%Y-%m-%dT%H:%M:%S%z").to_string(),
+                    tags: e.tags.clone(),
                 })
-            })
-            .collect();
-        println!("{}", serde_json::to_string_pretty(&output)?);
-    } else {
-        println!(
-            "{} Found {} entries matching '{}':",
-            "🔍".blue(),
-            entries.len(),
-            query.cyan()
-        );
-        println!();
+                .collect();
+            match format {
+                OutputFormat::Json => println!("{}", serde_json::to_string_pretty(&output)?),
+                OutputFormat::Yaml => println!("{}", serde_yaml::to_string(&output)?),
+                _ => unreachable!(),
+            }
+        }
+        OutputFormat::Text => {
+            println!(
+                "{} Found {} entries matching '{}':",
+                "🔍".blue(),
+                entries.len(),
+                query.cyan()
+            );
+            println!();
 
-        if entries.is_empty() {
-            println!("  {}", "(no matches)".dimmed());
-        } else {
-            for entry in &entries {
-                print_entry_summary(entry);
+            if entries.is_empty() {
+                println!("  {}", "(no matches)".dimmed());
+            } else {
+                for entry in &entries {
+                    print_entry_summary(entry);
+                }
             }
         }
     }

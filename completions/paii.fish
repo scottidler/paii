@@ -62,11 +62,13 @@ complete -c paii -n "__fish_paii_using_subcommand plugin; and not __fish_seen_su
 complete -c paii -n "__fish_paii_using_subcommand plugin; and not __fish_seen_subcommand_from list install remove update info new verify help" -f -a "new" -d 'Create a new plugin'
 complete -c paii -n "__fish_paii_using_subcommand plugin; and not __fish_seen_subcommand_from list install remove update info new verify help" -f -a "verify" -d 'Verify plugin installation'
 complete -c paii -n "__fish_paii_using_subcommand plugin; and not __fish_seen_subcommand_from list install remove update info new verify help" -f -a "help" -d 'Print this message or the help of the given subcommand(s)'
+complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from list" -s o -l format -d 'Output format (default: text for TTY, json for pipes)' -r -f -a "text\t'Human-readable text'
+json\t'JSON format'
+yaml\t'YAML format'"
 complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from list" -s c -l config -d 'Path to paii.toml config file' -r -F
-complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from list" -l json -d 'Output as JSON'
 complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from list" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from list" -s q -l quiet -d 'Suppress non-error output'
-complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from list" -s h -l help -d 'Print help'
+complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from list" -s h -l help -d 'Print help (see more with \'--help\')'
 complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from install" -s c -l config -d 'Path to paii.toml config file' -r -F
 complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from install" -l dev -d 'Symlink for development (don\'t copy)'
 complete -c paii -n "__fish_paii_using_subcommand plugin; and __fish_seen_subcommand_from install" -l force -d 'Overwrite existing installation'
@@ -136,11 +138,13 @@ complete -c paii -n "__fish_paii_using_subcommand history; and not __fish_seen_s
 complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -l category -d 'Category to search' -r
 complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -l limit -d 'Max results' -r
 complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -l since -d 'Only entries after this date' -r
+complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -s o -l format -d 'Output format (default: text for TTY, json for pipes)' -r -f -a "text\t'Human-readable text'
+json\t'JSON format'
+yaml\t'YAML format'"
 complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -s c -l config -d 'Path to paii.toml config file' -r -F
-complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -l json -d 'Output as JSON'
 complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -s q -l quiet -d 'Suppress non-error output'
-complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -s h -l help -d 'Print help'
+complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from query" -s h -l help -d 'Print help (see more with \'--help\')'
 complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from recent" -l category -d 'Category' -r
 complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from recent" -l count -d 'Number of entries' -r
 complete -c paii -n "__fish_paii_using_subcommand history; and __fish_seen_subcommand_from recent" -s c -l config -d 'Path to paii.toml config file' -r -F
@@ -163,11 +167,13 @@ complete -c paii -n "__fish_paii_using_subcommand config; and not __fish_seen_su
 complete -c paii -n "__fish_paii_using_subcommand config; and not __fish_seen_subcommand_from show get set help" -f -a "get" -d 'Get a configuration value'
 complete -c paii -n "__fish_paii_using_subcommand config; and not __fish_seen_subcommand_from show get set help" -f -a "set" -d 'Set a configuration value'
 complete -c paii -n "__fish_paii_using_subcommand config; and not __fish_seen_subcommand_from show get set help" -f -a "help" -d 'Print this message or the help of the given subcommand(s)'
+complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from show" -s o -l format -d 'Output format (default: text for TTY, json for pipes)' -r -f -a "text\t'Human-readable text'
+json\t'JSON format'
+yaml\t'YAML format'"
 complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from show" -s c -l config -d 'Path to paii.toml config file' -r -F
-complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from show" -l json -d 'Output as JSON'
 complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from show" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from show" -s q -l quiet -d 'Suppress non-error output'
-complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from show" -s h -l help -d 'Print help'
+complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from show" -s h -l help -d 'Print help (see more with \'--help\')'
 complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from get" -s c -l config -d 'Path to paii.toml config file' -r -F
 complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from get" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from get" -s q -l quiet -d 'Suppress non-error output'
@@ -180,16 +186,17 @@ complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcom
 complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from help" -f -a "get" -d 'Get a configuration value'
 complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from help" -f -a "set" -d 'Set a configuration value'
 complete -c paii -n "__fish_paii_using_subcommand config; and __fish_seen_subcommand_from help" -f -a "help" -d 'Print this message or the help of the given subcommand(s)'
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -s c -l config -d 'Path to paii.toml config file' -r -F
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -s v -l verbose -d 'Enable verbose output'
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -s q -l quiet -d 'Suppress non-error output'
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -s h -l help -d 'Print help'
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -f -a "list" -d 'List configured registries'
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -f -a "add" -d 'Add a registry'
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -f -a "remove" -d 'Remove a registry'
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -f -a "update" -d 'Update registry listings'
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -f -a "search" -d 'Search for plugins in cached registries'
-complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search help" -f -a "help" -d 'Print this message or the help of the given subcommand(s)'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -s c -l config -d 'Path to paii.toml config file' -r -F
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -s v -l verbose -d 'Enable verbose output'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -s q -l quiet -d 'Suppress non-error output'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -s h -l help -d 'Print help'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -f -a "list" -d 'List configured registries'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -f -a "add" -d 'Add a registry'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -f -a "remove" -d 'Remove a registry'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -f -a "update" -d 'Update registry listings'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -f -a "search" -d 'Search for plugins in cached registries'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -f -a "show" -d 'Show all plugins in a cached registry'
+complete -c paii -n "__fish_paii_using_subcommand registry; and not __fish_seen_subcommand_from list add remove update search show help" -f -a "help" -d 'Print this message or the help of the given subcommand(s)'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from list" -s c -l config -d 'Path to paii.toml config file' -r -F
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from list" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from list" -s q -l quiet -d 'Suppress non-error output'
@@ -206,26 +213,38 @@ complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subc
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from update" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from update" -s q -l quiet -d 'Suppress non-error output'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from update" -s h -l help -d 'Print help'
+complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from search" -s o -l format -d 'Output format (default: text for TTY, json for pipes)' -r -f -a "text\t'Human-readable text'
+json\t'JSON format'
+yaml\t'YAML format'"
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from search" -s c -l config -d 'Path to paii.toml config file' -r -F
-complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from search" -l json -d 'Output as JSON'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from search" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from search" -s q -l quiet -d 'Suppress non-error output'
-complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from search" -s h -l help -d 'Print help'
+complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from search" -s h -l help -d 'Print help (see more with \'--help\')'
+complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from show" -s o -l format -d 'Output format (default: text for TTY, json for pipes)' -r -f -a "text\t'Human-readable text'
+json\t'JSON format'
+yaml\t'YAML format'"
+complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from show" -s c -l config -d 'Path to paii.toml config file' -r -F
+complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from show" -s v -l verbose -d 'Enable verbose output'
+complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from show" -s q -l quiet -d 'Suppress non-error output'
+complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from show" -s h -l help -d 'Print help (see more with \'--help\')'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from help" -f -a "list" -d 'List configured registries'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from help" -f -a "add" -d 'Add a registry'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from help" -f -a "remove" -d 'Remove a registry'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from help" -f -a "update" -d 'Update registry listings'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from help" -f -a "search" -d 'Search for plugins in cached registries'
+complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from help" -f -a "show" -d 'Show all plugins in a cached registry'
 complete -c paii -n "__fish_paii_using_subcommand registry; and __fish_seen_subcommand_from help" -f -a "help" -d 'Print this message or the help of the given subcommand(s)'
 complete -c paii -n "__fish_paii_using_subcommand run" -s c -l config -d 'Path to paii.toml config file' -r -F
 complete -c paii -n "__fish_paii_using_subcommand run" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand run" -s q -l quiet -d 'Suppress non-error output'
 complete -c paii -n "__fish_paii_using_subcommand run" -s h -l help -d 'Print help'
+complete -c paii -n "__fish_paii_using_subcommand status" -s o -l format -d 'Output format (default: text for TTY, json for pipes)' -r -f -a "text\t'Human-readable text'
+json\t'JSON format'
+yaml\t'YAML format'"
 complete -c paii -n "__fish_paii_using_subcommand status" -s c -l config -d 'Path to paii.toml config file' -r -F
-complete -c paii -n "__fish_paii_using_subcommand status" -l json -d 'Output as JSON'
 complete -c paii -n "__fish_paii_using_subcommand status" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand status" -s q -l quiet -d 'Suppress non-error output'
-complete -c paii -n "__fish_paii_using_subcommand status" -s h -l help -d 'Print help'
+complete -c paii -n "__fish_paii_using_subcommand status" -s h -l help -d 'Print help (see more with \'--help\')'
 complete -c paii -n "__fish_paii_using_subcommand completions" -s c -l config -d 'Path to paii.toml config file' -r -F
 complete -c paii -n "__fish_paii_using_subcommand completions" -s v -l verbose -d 'Enable verbose output'
 complete -c paii -n "__fish_paii_using_subcommand completions" -s q -l quiet -d 'Suppress non-error output'
@@ -261,3 +280,4 @@ complete -c paii -n "__fish_paii_using_subcommand help; and __fish_seen_subcomma
 complete -c paii -n "__fish_paii_using_subcommand help; and __fish_seen_subcommand_from registry" -f -a "remove" -d 'Remove a registry'
 complete -c paii -n "__fish_paii_using_subcommand help; and __fish_seen_subcommand_from registry" -f -a "update" -d 'Update registry listings'
 complete -c paii -n "__fish_paii_using_subcommand help; and __fish_seen_subcommand_from registry" -f -a "search" -d 'Search for plugins in cached registries'
+complete -c paii -n "__fish_paii_using_subcommand help; and __fish_seen_subcommand_from registry" -f -a "show" -d 'Show all plugins in a cached registry'

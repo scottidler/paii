@@ -163,6 +163,9 @@ _paii() {
             paii__help__registry,search)
                 cmd="paii__help__registry__search"
                 ;;
+            paii__help__registry,show)
+                cmd="paii__help__registry__show"
+                ;;
             paii__help__registry,update)
                 cmd="paii__help__registry__update"
                 ;;
@@ -271,6 +274,9 @@ _paii() {
             paii__registry,search)
                 cmd="paii__registry__search"
                 ;;
+            paii__registry,show)
+                cmd="paii__registry__show"
+                ;;
             paii__registry,update)
                 cmd="paii__registry__update"
                 ;;
@@ -288,6 +294,9 @@ _paii() {
                 ;;
             paii__registry__help,search)
                 cmd="paii__registry__help__search"
+                ;;
+            paii__registry__help,show)
+                cmd="paii__registry__help__show"
                 ;;
             paii__registry__help,update)
                 cmd="paii__registry__help__update"
@@ -479,12 +488,20 @@ _paii() {
             return 0
             ;;
         paii__config__show)
-            opts="-c -v -q -h --json --config --verbose --quiet --help"
+            opts="-o -c -v -q -h --format --config --verbose --quiet --help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
+                --format)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
+                -o)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
                 --config)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
@@ -859,7 +876,7 @@ _paii() {
             return 0
             ;;
         paii__help__registry)
-            opts="list add remove update search"
+            opts="list add remove update search show"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -915,6 +932,20 @@ _paii() {
             return 0
             ;;
         paii__help__registry__search)
+            opts=""
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        paii__help__registry__show)
             opts=""
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
@@ -1085,7 +1116,7 @@ _paii() {
             return 0
             ;;
         paii__history__query)
-            opts="-c -v -q -h --category --limit --since --json --config --verbose --quiet --help <QUERY>"
+            opts="-o -c -v -q -h --category --limit --since --format --config --verbose --quiet --help <QUERY>"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -1101,6 +1132,14 @@ _paii() {
                     ;;
                 --since)
                     COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                --format)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
+                -o)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
                     return 0
                     ;;
                 --config)
@@ -1497,12 +1536,20 @@ _paii() {
             return 0
             ;;
         paii__plugin__list)
-            opts="-c -v -q -h --json --config --verbose --quiet --help"
+            opts="-o -c -v -q -h --format --config --verbose --quiet --help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
+                --format)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
+                -o)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
                 --config)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
@@ -1619,7 +1666,7 @@ _paii() {
             return 0
             ;;
         paii__registry)
-            opts="-c -v -q -h --config --verbose --quiet --help list add remove update search help"
+            opts="-c -v -q -h --config --verbose --quiet --help list add remove update search show help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -1663,7 +1710,7 @@ _paii() {
             return 0
             ;;
         paii__registry__help)
-            opts="list add remove update search help"
+            opts="list add remove update search show help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -1746,6 +1793,20 @@ _paii() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
+        paii__registry__help__show)
+            opts=""
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
         paii__registry__help__update)
             opts=""
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
@@ -1805,12 +1866,50 @@ _paii() {
             return 0
             ;;
         paii__registry__search)
-            opts="-c -v -q -h --json --config --verbose --quiet --help <QUERY>"
+            opts="-o -c -v -q -h --format --config --verbose --quiet --help <QUERY>"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
+                --format)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
+                -o)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
+                --config)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                -c)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        paii__registry__show)
+            opts="-o -c -v -q -h --format --config --verbose --quiet --help <NAME>"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                --format)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
+                -o)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
                 --config)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
@@ -1871,12 +1970,20 @@ _paii() {
             return 0
             ;;
         paii__status)
-            opts="-c -v -q -h --json --config --verbose --quiet --help"
+            opts="-o -c -v -q -h --format --config --verbose --quiet --help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
+                --format)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
+                -o)
+                    COMPREPLY=($(compgen -W "text json yaml" -- "${cur}"))
+                    return 0
+                    ;;
                 --config)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0

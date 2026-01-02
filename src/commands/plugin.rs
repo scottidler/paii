@@ -1,11 +1,11 @@
 use colored::*;
 use eyre::{Context, Result};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-use crate::cli::PluginAction;
+use crate::cli::{OutputFormat, PluginAction};
 use crate::config::Config;
 use crate::plugin::loader::load_plugin;
 
@@ -41,7 +41,7 @@ struct RegistryMeta {
 
 pub fn run(action: PluginAction, config: &Config) -> Result<()> {
     match action {
-        PluginAction::List { json } => list(json, config),
+        PluginAction::List { format } => list(OutputFormat::resolve(format), config),
         PluginAction::Install { source, dev, force } => install(&source, dev, force, config),
         PluginAction::Remove { name, force } => remove(&name, force, config),
         PluginAction::Update { name } => update(&name, config),
@@ -56,16 +56,28 @@ pub fn run(action: PluginAction, config: &Config) -> Result<()> {
     }
 }
 
-fn list(json: bool, config: &Config) -> Result<()> {
+/// Plugin info for serialization
+#[derive(Debug, Serialize)]
+struct PluginInfo {
+    name: String,
+    version: String,
+    description: String,
+    language: String,
+    path: String,
+}
+
+fn list(format: OutputFormat, config: &Config) -> Result<()> {
     let plugins_dir = Config::expand_path(&config.paths.plugins);
 
     if !plugins_dir.exists() {
-        if json {
-            println!("[]");
-        } else {
-            println!("{}", "Installed plugins:".bold());
-            println!();
-            println!("  {}", "(none)".dimmed());
+        match format {
+            OutputFormat::Json => println!("[]"),
+            OutputFormat::Yaml => println!("[]"),
+            OutputFormat::Text => {
+                println!("{}", "Installed plugins:".bold());
+                println!();
+                println!("  {}", "(none)".dimmed());
+            }
         }
         return Ok(());
     }
@@ -90,34 +102,39 @@ fn list(json: bool, config: &Config) -> Result<()> {
         }
     }
 
-    if json {
-        let output: Vec<serde_json::Value> = plugins
-            .iter()
-            .map(|p| {
-                serde_json::json!({
-                    "name": p.manifest.plugin.name,
-                    "version": p.manifest.plugin.version,
-                    "description": p.manifest.plugin.description,
-                    "language": format!("{:?}", p.manifest.plugin.language),
-                    "path": p.path.display().to_string(),
+    match format {
+        OutputFormat::Json | OutputFormat::Yaml => {
+            let output: Vec<PluginInfo> = plugins
+                .iter()
+                .map(|p| PluginInfo {
+                    name: p.manifest.plugin.name.clone(),
+                    version: p.manifest.plugin.version.clone(),
+                    description: p.manifest.plugin.description.clone(),
+                    language: format!("{:?}", p.manifest.plugin.language),
+                    path: p.path.display().to_string(),
                 })
-            })
-            .collect();
-        println!("{}", serde_json::to_string_pretty(&output)?);
-    } else {
-        println!("{}", "Installed plugins:".bold());
-        println!();
+                .collect();
+            match format {
+                OutputFormat::Json => println!("{}", serde_json::to_string_pretty(&output)?),
+                OutputFormat::Yaml => println!("{}", serde_yaml::to_string(&output)?),
+                _ => unreachable!(),
+            }
+        }
+        OutputFormat::Text => {
+            println!("{}", "Installed plugins:".bold());
+            println!();
 
-        if plugins.is_empty() {
-            println!("  {}", "(none)".dimmed());
-        } else {
-            for plugin in &plugins {
-                println!(
-                    "  {} {} {}",
-                    plugin.manifest.plugin.name.green(),
-                    format!("v{}", plugin.manifest.plugin.version).dimmed(),
-                    format!("- {}", plugin.manifest.plugin.description).dimmed(),
-                );
+            if plugins.is_empty() {
+                println!("  {}", "(none)".dimmed());
+            } else {
+                for plugin in &plugins {
+                    println!(
+                        "  {} {} {}",
+                        plugin.manifest.plugin.name.green(),
+                        format!("v{}", plugin.manifest.plugin.version).dimmed(),
+                        format!("- {}", plugin.manifest.plugin.description).dimmed(),
+                    );
+                }
             }
         }
     }
@@ -365,11 +382,76 @@ fn remove(name: &str, force: bool, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn update(name: &str, _config: &Config) -> Result<()> {
+fn update(name: &str, config: &Config) -> Result<()> {
     println!("{} Updating plugin: {}", "→".blue(), name.cyan());
 
-    // TODO: Implement plugin update
-    println!("  {} Plugin update not yet implemented", "⚠".yellow());
+    // Check if plugin is installed
+    let plugin = match find_plugin(name, config) {
+        Ok(p) => p,
+        Err(_) => {
+            eyre::bail!("Plugin '{}' is not installed", name);
+        }
+    };
+
+    let current_version = &plugin.manifest.plugin.version;
+    println!("  Current version: {}", current_version.dimmed());
+
+    // Check if it's a dev install (symlink)
+    let plugins_dir = Config::expand_path(&config.paths.plugins);
+    let plugin_path = plugins_dir.join(name);
+    if plugin_path.symlink_metadata()?.file_type().is_symlink() {
+        println!("  {} Plugin is installed in dev mode (symlink)", "⚠".yellow());
+        println!("    Update the source directory directly");
+        return Ok(());
+    }
+
+    // Look up in registry to get source
+    let registries_dir = Config::expand_path(&config.paths.registries);
+    let mut found_plugin: Option<RegistryPlugin> = None;
+
+    if registries_dir.exists() {
+        for entry in fs::read_dir(&registries_dir)? {
+            let entry = entry?;
+            let path = entry.path();
+
+            if path.extension().is_some_and(|e| e == "toml") {
+                let content = fs::read_to_string(&path)?;
+                if let Ok(registry) = toml::from_str::<RegistryFile>(&content) {
+                    for p in registry.plugins {
+                        if p.name == name {
+                            found_plugin = Some(p);
+                            break;
+                        }
+                    }
+                }
+                if found_plugin.is_some() {
+                    break;
+                }
+            }
+        }
+    }
+
+    let registry_plugin = match found_plugin {
+        Some(p) => p,
+        None => {
+            println!("  {} Plugin not found in registry, cannot update", "⚠".yellow());
+            println!("    Try reinstalling from source");
+            return Ok(());
+        }
+    };
+
+    let new_version = registry_plugin.version.as_deref().unwrap_or("unknown");
+    if new_version == current_version {
+        println!("  {} Already at latest version ({})", "✓".green(), new_version);
+        return Ok(());
+    }
+
+    println!("  New version available: {}", new_version.green());
+
+    // Reinstall from registry (force)
+    install_from_registry(name, true, config)?;
+
+    println!("  {} Updated {} to v{}", "✓".green(), name, new_version);
 
     Ok(())
 }

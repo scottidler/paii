@@ -82,15 +82,20 @@ _arguments "${_arguments_options[@]}" : \
         case $line[1] in
             (list)
 _arguments "${_arguments_options[@]}" : \
+'-o+[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
+'--format=[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
 '-c+[Path to paii.toml config file]:CONFIG:_files' \
 '--config=[Path to paii.toml config file]:CONFIG:_files' \
-'--json[Output as JSON]' \
 '-v[Enable verbose output]' \
 '--verbose[Enable verbose output]' \
 '-q[Suppress non-error output]' \
 '--quiet[Suppress non-error output]' \
-'-h[Print help]' \
-'--help[Print help]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
 && ret=0
 ;;
 (install)
@@ -333,15 +338,20 @@ _arguments "${_arguments_options[@]}" : \
 '--category=[Category to search]:CATEGORY:_default' \
 '--limit=[Max results]:LIMIT:_default' \
 '--since=[Only entries after this date]:SINCE:_default' \
+'-o+[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
+'--format=[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
 '-c+[Path to paii.toml config file]:CONFIG:_files' \
 '--config=[Path to paii.toml config file]:CONFIG:_files' \
-'--json[Output as JSON]' \
 '-v[Enable verbose output]' \
 '--verbose[Enable verbose output]' \
 '-q[Suppress non-error output]' \
 '--quiet[Suppress non-error output]' \
-'-h[Print help]' \
-'--help[Print help]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
 ':query -- Search query (regex):_default' \
 && ret=0
 ;;
@@ -429,15 +439,20 @@ _arguments "${_arguments_options[@]}" : \
         case $line[1] in
             (show)
 _arguments "${_arguments_options[@]}" : \
+'-o+[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
+'--format=[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
 '-c+[Path to paii.toml config file]:CONFIG:_files' \
 '--config=[Path to paii.toml config file]:CONFIG:_files' \
-'--json[Output as JSON]' \
 '-v[Enable verbose output]' \
 '--verbose[Enable verbose output]' \
 '-q[Suppress non-error output]' \
 '--quiet[Suppress non-error output]' \
-'-h[Print help]' \
-'--help[Print help]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
 && ret=0
 ;;
 (get)
@@ -577,16 +592,40 @@ _arguments "${_arguments_options[@]}" : \
 ;;
 (search)
 _arguments "${_arguments_options[@]}" : \
+'-o+[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
+'--format=[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
 '-c+[Path to paii.toml config file]:CONFIG:_files' \
 '--config=[Path to paii.toml config file]:CONFIG:_files' \
-'--json[Output as JSON]' \
 '-v[Enable verbose output]' \
 '--verbose[Enable verbose output]' \
 '-q[Suppress non-error output]' \
 '--quiet[Suppress non-error output]' \
-'-h[Print help]' \
-'--help[Print help]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
 ':query -- Search query (matches name, description, tags):_default' \
+&& ret=0
+;;
+(show)
+_arguments "${_arguments_options[@]}" : \
+'-o+[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
+'--format=[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
+'-c+[Path to paii.toml config file]:CONFIG:_files' \
+'--config=[Path to paii.toml config file]:CONFIG:_files' \
+'-v[Enable verbose output]' \
+'--verbose[Enable verbose output]' \
+'-q[Suppress non-error output]' \
+'--quiet[Suppress non-error output]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+':name -- Registry name:_default' \
 && ret=0
 ;;
 (help)
@@ -621,6 +660,10 @@ _arguments "${_arguments_options[@]}" : \
 _arguments "${_arguments_options[@]}" : \
 && ret=0
 ;;
+(show)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
 (help)
 _arguments "${_arguments_options[@]}" : \
 && ret=0
@@ -650,15 +693,20 @@ _arguments "${_arguments_options[@]}" : \
 ;;
 (status)
 _arguments "${_arguments_options[@]}" : \
+'-o+[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
+'--format=[Output format (default\: text for TTY, json for pipes)]:FORMAT:((text\:"Human-readable text"
+json\:"JSON format"
+yaml\:"YAML format"))' \
 '-c+[Path to paii.toml config file]:CONFIG:_files' \
 '--config=[Path to paii.toml config file]:CONFIG:_files' \
-'--json[Output as JSON]' \
 '-v[Enable verbose output]' \
 '--verbose[Enable verbose output]' \
 '-q[Suppress non-error output]' \
 '--quiet[Suppress non-error output]' \
-'-h[Print help]' \
-'--help[Print help]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
 && ret=0
 ;;
 (completions)
@@ -847,6 +895,10 @@ _arguments "${_arguments_options[@]}" : \
 && ret=0
 ;;
 (search)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(show)
 _arguments "${_arguments_options[@]}" : \
 && ret=0
 ;;
@@ -1120,6 +1172,7 @@ _paii__help__registry_commands() {
 'remove:Remove a registry' \
 'update:Update registry listings' \
 'search:Search for plugins in cached registries' \
+'show:Show all plugins in a cached registry' \
     )
     _describe -t commands 'paii help registry commands' commands "$@"
 }
@@ -1142,6 +1195,11 @@ _paii__help__registry__remove_commands() {
 _paii__help__registry__search_commands() {
     local commands; commands=()
     _describe -t commands 'paii help registry search commands' commands "$@"
+}
+(( $+functions[_paii__help__registry__show_commands] )) ||
+_paii__help__registry__show_commands() {
+    local commands; commands=()
+    _describe -t commands 'paii help registry show commands' commands "$@"
 }
 (( $+functions[_paii__help__registry__update_commands] )) ||
 _paii__help__registry__update_commands() {
@@ -1372,6 +1430,7 @@ _paii__registry_commands() {
 'remove:Remove a registry' \
 'update:Update registry listings' \
 'search:Search for plugins in cached registries' \
+'show:Show all plugins in a cached registry' \
 'help:Print this message or the help of the given subcommand(s)' \
     )
     _describe -t commands 'paii registry commands' commands "$@"
@@ -1389,6 +1448,7 @@ _paii__registry__help_commands() {
 'remove:Remove a registry' \
 'update:Update registry listings' \
 'search:Search for plugins in cached registries' \
+'show:Show all plugins in a cached registry' \
 'help:Print this message or the help of the given subcommand(s)' \
     )
     _describe -t commands 'paii registry help commands' commands "$@"
@@ -1418,6 +1478,11 @@ _paii__registry__help__search_commands() {
     local commands; commands=()
     _describe -t commands 'paii registry help search commands' commands "$@"
 }
+(( $+functions[_paii__registry__help__show_commands] )) ||
+_paii__registry__help__show_commands() {
+    local commands; commands=()
+    _describe -t commands 'paii registry help show commands' commands "$@"
+}
 (( $+functions[_paii__registry__help__update_commands] )) ||
 _paii__registry__help__update_commands() {
     local commands; commands=()
@@ -1437,6 +1502,11 @@ _paii__registry__remove_commands() {
 _paii__registry__search_commands() {
     local commands; commands=()
     _describe -t commands 'paii registry search commands' commands "$@"
+}
+(( $+functions[_paii__registry__show_commands] )) ||
+_paii__registry__show_commands() {
+    local commands; commands=()
+    _describe -t commands 'paii registry show commands' commands "$@"
 }
 (( $+functions[_paii__registry__update_commands] )) ||
 _paii__registry__update_commands() {

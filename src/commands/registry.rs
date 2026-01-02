@@ -1,9 +1,9 @@
 use colored::*;
 use eyre::{Context, Result};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fs;
 
-use crate::cli::RegistryAction;
+use crate::cli::{OutputFormat, RegistryAction};
 use crate::config::Config;
 
 /// Parsed registry file
@@ -25,22 +25,22 @@ struct RegistryMeta {
     version: Option<String>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 struct PluginEntry {
     name: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     version: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     description: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     source: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     path: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     language: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     r#type: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     tags: Vec<String>,
 }
 
@@ -50,7 +50,8 @@ pub fn run(action: RegistryAction, config: &Config) -> Result<()> {
         RegistryAction::Add { name, url } => add(&name, &url, config),
         RegistryAction::Remove { name } => remove(&name, config),
         RegistryAction::Update { name } => update(name.as_deref(), config),
-        RegistryAction::Search { query, json } => search(&query, json, config),
+        RegistryAction::Search { query, format } => search(&query, OutputFormat::resolve(format), config),
+        RegistryAction::Show { name, format } => show(&name, OutputFormat::resolve(format), config),
     }
 }
 
@@ -216,7 +217,7 @@ struct SearchResult {
     plugin: PluginEntry,
 }
 
-fn search(query: &str, json: bool, config: &Config) -> Result<()> {
+fn search(query: &str, format: OutputFormat, config: &Config) -> Result<()> {
     let registries_dir = Config::expand_path(&config.paths.registries);
     let query_lower = query.to_lowercase();
 
@@ -258,56 +259,123 @@ fn search(query: &str, json: bool, config: &Config) -> Result<()> {
         }
     }
 
-    if json {
-        // Output as JSON
-        let json_results: Vec<serde_json::Value> = results
-            .iter()
-            .map(|r| {
-                serde_json::json!({
-                    "registry": r.registry,
-                    "name": r.plugin.name,
-                    "version": r.plugin.version,
-                    "description": r.plugin.description,
-                    "language": r.plugin.language,
-                    "type": r.plugin.r#type,
-                    "tags": r.plugin.tags,
-                    "source": r.plugin.source,
-                    "path": r.plugin.path,
+    match format {
+        OutputFormat::Json => {
+            let json_results: Vec<serde_json::Value> = results
+                .iter()
+                .map(|r| {
+                    serde_json::json!({
+                        "registry": r.registry,
+                        "name": r.plugin.name,
+                        "version": r.plugin.version,
+                        "description": r.plugin.description,
+                        "language": r.plugin.language,
+                        "type": r.plugin.r#type,
+                        "tags": r.plugin.tags,
+                        "source": r.plugin.source,
+                        "path": r.plugin.path,
+                    })
                 })
-            })
-            .collect();
-        println!("{}", serde_json::to_string_pretty(&json_results)?);
-    } else {
-        // Human-readable output
-        if results.is_empty() {
-            println!("{}", "No plugins found matching query.".dimmed());
-            println!();
-            println!(
-                "Try running {} to update registries first.",
-                "paii registry update".cyan()
-            );
-            return Ok(());
+                .collect();
+            println!("{}", serde_json::to_string_pretty(&json_results)?);
         }
-
-        println!("{} {} plugin(s) found:\n", "→".blue(), results.len());
-
-        for result in &results {
-            let desc = result.plugin.description.as_deref().unwrap_or("No description");
-            let version = result.plugin.version.as_deref().unwrap_or("?");
-            let lang = result.plugin.language.as_deref().unwrap_or("?");
-
-            println!(
-                "  {} {} ({})",
-                result.plugin.name.cyan().bold(),
-                format!("v{}", version).dimmed(),
-                lang.yellow()
-            );
-            println!("    {}", desc.dimmed());
-            if !result.plugin.tags.is_empty() {
-                println!("    Tags: {}", result.plugin.tags.join(", ").blue());
+        OutputFormat::Yaml => {
+            let plugins: Vec<&PluginEntry> = results.iter().map(|r| &r.plugin).collect();
+            println!("{}", serde_yaml::to_string(&plugins)?);
+        }
+        OutputFormat::Text => {
+            if results.is_empty() {
+                println!("{}", "No plugins found matching query.".dimmed());
+                println!();
+                println!(
+                    "Try running {} to update registries first.",
+                    "paii registry update".cyan()
+                );
+                return Ok(());
             }
-            println!("    Registry: {}", result.registry.dimmed());
-            println!();
+
+            println!("{} {} plugin(s) found:\n", "→".blue(), results.len());
+
+            for result in &results {
+                let desc = result.plugin.description.as_deref().unwrap_or("No description");
+                let version = result.plugin.version.as_deref().unwrap_or("?");
+                let lang = result.plugin.language.as_deref().unwrap_or("?");
+
+                println!(
+                    "  {} {} ({})",
+                    result.plugin.name.cyan().bold(),
+                    format!("v{}", version).dimmed(),
+                    lang.yellow()
+                );
+                println!("    {}", desc.dimmed());
+                if !result.plugin.tags.is_empty() {
+                    println!("    Tags: {}", result.plugin.tags.join(", ").blue());
+                }
+                println!("    Registry: {}", result.registry.dimmed());
+                println!();
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn show(name: &str, format: OutputFormat, config: &Config) -> Result<()> {
+    let registries_dir = Config::expand_path(&config.paths.registries);
+    let cache_file = registries_dir.join(format!("{}.toml", name));
+
+    if !cache_file.exists() {
+        // Check if registry is configured but not cached
+        if config.registries.contains_key(name) {
+            eyre::bail!(
+                "Registry '{}' is configured but not cached.\nRun 'paii registry update {}' first.",
+                name,
+                name
+            );
+        } else {
+            eyre::bail!("Registry '{}' not found", name);
+        }
+    }
+
+    let content = fs::read_to_string(&cache_file).context("Failed to read registry file")?;
+    let registry: RegistryFile = toml::from_str(&content).context("Failed to parse registry file")?;
+
+    match format {
+        OutputFormat::Json => {
+            println!("{}", serde_json::to_string_pretty(&registry.plugins)?);
+        }
+        OutputFormat::Yaml => {
+            println!("{}", serde_yaml::to_string(&registry.plugins)?);
+        }
+        OutputFormat::Text => {
+            println!(
+                "{} {} ({} plugins)\n",
+                "Registry:".bold(),
+                name.cyan(),
+                registry.plugins.len()
+            );
+
+            if registry.plugins.is_empty() {
+                println!("  {}", "(no plugins)".dimmed());
+            } else {
+                for plugin in &registry.plugins {
+                    let version = plugin.version.as_deref().unwrap_or("?");
+                    let lang = plugin.language.as_deref().unwrap_or("?");
+                    let desc = plugin.description.as_deref().unwrap_or("No description");
+
+                    println!(
+                        "  {} {} ({})",
+                        plugin.name.cyan().bold(),
+                        format!("v{}", version).dimmed(),
+                        lang.yellow()
+                    );
+                    println!("    {}", desc.dimmed());
+                    if !plugin.tags.is_empty() {
+                        println!("    Tags: {}", plugin.tags.join(", ").blue());
+                    }
+                    println!();
+                }
+            }
         }
     }
 
