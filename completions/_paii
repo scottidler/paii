@@ -34,7 +34,33 @@ _paii() {
         (( CURRENT += 1 ))
         curcontext="${curcontext%:*:*}:paii-command-$line[1]:"
         case $line[1] in
-            (plugin)
+            (init)
+_arguments "${_arguments_options[@]}" : \
+'--path=[Directory to initialize (defaults to ~/.config/paii)]:PATH:_files' \
+'-c+[Path to paii.toml config file]:CONFIG:_files' \
+'--config=[Path to paii.toml config file]:CONFIG:_files' \
+'--force[Overwrite existing configuration]' \
+'-v[Enable verbose output]' \
+'--verbose[Enable verbose output]' \
+'-q[Suppress non-error output]' \
+'--quiet[Suppress non-error output]' \
+'-h[Print help]' \
+'--help[Print help]' \
+&& ret=0
+;;
+(doctor)
+_arguments "${_arguments_options[@]}" : \
+'-c+[Path to paii.toml config file]:CONFIG:_files' \
+'--config=[Path to paii.toml config file]:CONFIG:_files' \
+'-v[Enable verbose output]' \
+'--verbose[Enable verbose output]' \
+'-q[Suppress non-error output]' \
+'--quiet[Suppress non-error output]' \
+'-h[Print help]' \
+'--help[Print help]' \
+&& ret=0
+;;
+(plugin)
 _arguments "${_arguments_options[@]}" : \
 '-c+[Path to paii.toml config file]:CONFIG:_files' \
 '--config=[Path to paii.toml config file]:CONFIG:_files' \
@@ -660,7 +686,15 @@ _arguments "${_arguments_options[@]}" : \
         (( CURRENT += 1 ))
         curcontext="${curcontext%:*:*}:paii-help-command-$line[1]:"
         case $line[1] in
-            (plugin)
+            (init)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(doctor)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(plugin)
 _arguments "${_arguments_options[@]}" : \
 ":: :_paii__help__plugin_commands" \
 "*::: :->plugin" \
@@ -848,6 +882,8 @@ esac
 (( $+functions[_paii_commands] )) ||
 _paii_commands() {
     local commands; commands=(
+'init:Initialize PAII configuration' \
+'doctor:Diagnose setup issues' \
 'plugin:Manage plugins' \
 'hook:Handle hook events from Claude Code' \
 'history:Query and manage history' \
@@ -920,9 +956,16 @@ _paii__config__show_commands() {
     local commands; commands=()
     _describe -t commands 'paii config show commands' commands "$@"
 }
+(( $+functions[_paii__doctor_commands] )) ||
+_paii__doctor_commands() {
+    local commands; commands=()
+    _describe -t commands 'paii doctor commands' commands "$@"
+}
 (( $+functions[_paii__help_commands] )) ||
 _paii__help_commands() {
     local commands; commands=(
+'init:Initialize PAII configuration' \
+'doctor:Diagnose setup issues' \
 'plugin:Manage plugins' \
 'hook:Handle hook events from Claude Code' \
 'history:Query and manage history' \
@@ -963,6 +1006,11 @@ _paii__help__config__set_commands() {
 _paii__help__config__show_commands() {
     local commands; commands=()
     _describe -t commands 'paii help config show commands' commands "$@"
+}
+(( $+functions[_paii__help__doctor_commands] )) ||
+_paii__help__doctor_commands() {
+    local commands; commands=()
+    _describe -t commands 'paii help doctor commands' commands "$@"
 }
 (( $+functions[_paii__help__help_commands] )) ||
 _paii__help__help_commands() {
@@ -1010,6 +1058,11 @@ _paii__help__hook__dispatch_commands() {
 _paii__help__hook__list_commands() {
     local commands; commands=()
     _describe -t commands 'paii help hook list commands' commands "$@"
+}
+(( $+functions[_paii__help__init_commands] )) ||
+_paii__help__init_commands() {
+    local commands; commands=()
+    _describe -t commands 'paii help init commands' commands "$@"
 }
 (( $+functions[_paii__help__plugin_commands] )) ||
 _paii__help__plugin_commands() {
@@ -1202,6 +1255,11 @@ _paii__hook__help__list_commands() {
 _paii__hook__list_commands() {
     local commands; commands=()
     _describe -t commands 'paii hook list commands' commands "$@"
+}
+(( $+functions[_paii__init_commands] )) ||
+_paii__init_commands() {
+    local commands; commands=()
+    _describe -t commands 'paii init commands' commands "$@"
 }
 (( $+functions[_paii__plugin_commands] )) ||
 _paii__plugin_commands() {

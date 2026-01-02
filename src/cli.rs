@@ -27,6 +27,20 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    /// Initialize PAII configuration
+    Init {
+        /// Directory to initialize (defaults to ~/.config/paii)
+        #[arg(long)]
+        path: Option<PathBuf>,
+
+        /// Overwrite existing configuration
+        #[arg(long)]
+        force: bool,
+    },
+
+    /// Diagnose setup issues
+    Doctor,
+
     /// Manage plugins
     Plugin {
         #[command(subcommand)]

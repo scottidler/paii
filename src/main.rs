@@ -45,6 +45,8 @@ fn setup_logging() -> Result<()> {
 
 fn run(cli: Cli, config: Config) -> Result<()> {
     match cli.command {
+        Commands::Init { path, force } => commands::init::run(path, force),
+        Commands::Doctor => commands::doctor::run(&config),
         Commands::Plugin { action } => commands::plugin::run(action, &config),
         Commands::Hook { action } => commands::hook::run(action, &config),
         Commands::History { action } => commands::history::run(action, &config),

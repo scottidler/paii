@@ -22,6 +22,9 @@ _paii() {
             paii,config)
                 cmd="paii__config"
                 ;;
+            paii,doctor)
+                cmd="paii__doctor"
+                ;;
             paii,help)
                 cmd="paii__help"
                 ;;
@@ -30,6 +33,9 @@ _paii() {
                 ;;
             paii,hook)
                 cmd="paii__hook"
+                ;;
+            paii,init)
+                cmd="paii__init"
                 ;;
             paii,plugin)
                 cmd="paii__plugin"
@@ -73,6 +79,9 @@ _paii() {
             paii__help,config)
                 cmd="paii__help__config"
                 ;;
+            paii__help,doctor)
+                cmd="paii__help__doctor"
+                ;;
             paii__help,help)
                 cmd="paii__help__help"
                 ;;
@@ -81,6 +90,9 @@ _paii() {
                 ;;
             paii__help,hook)
                 cmd="paii__help__hook"
+                ;;
+            paii__help,init)
+                cmd="paii__help__init"
                 ;;
             paii__help,plugin)
                 cmd="paii__help__plugin"
@@ -287,7 +299,7 @@ _paii() {
 
     case "${cmd}" in
         paii)
-            opts="-c -v -q -h -V --config --verbose --quiet --help --version plugin hook history config registry run status completions help"
+            opts="-c -v -q -h -V --config --verbose --quiet --help --version init doctor plugin hook history config registry run status completions help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -488,8 +500,30 @@ _paii() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
+        paii__doctor)
+            opts="-c -v -q -h --config --verbose --quiet --help"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                --config)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                -c)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
         paii__help)
-            opts="plugin hook history config registry run status completions help"
+            opts="init doctor plugin hook history config registry run status completions help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -561,6 +595,20 @@ _paii() {
         paii__help__config__show)
             opts=""
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        paii__help__doctor)
+            opts=""
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
@@ -673,6 +721,20 @@ _paii() {
         paii__help__hook__list)
             opts=""
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 4 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        paii__help__init)
+            opts=""
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
@@ -1198,6 +1260,32 @@ _paii() {
             fi
             case "${prev}" in
                 --event)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                --config)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                -c)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        paii__init)
+            opts="-c -v -q -h --path --force --config --verbose --quiet --help"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                --path)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;

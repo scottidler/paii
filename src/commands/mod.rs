@@ -1,7 +1,9 @@
 pub mod completions;
 pub mod config;
+pub mod doctor;
 pub mod history;
 pub mod hook;
+pub mod init;
 pub mod plugin;
 pub mod registry;
 pub mod run;
