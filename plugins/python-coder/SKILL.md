@@ -7,6 +7,23 @@ description: Write Python code using Scott's conventions. Use when creating Pyth
 
 This skill teaches you Scott's Python coding patterns, tools, and conventions. Follow these guidelines when writing or reviewing Python code.
 
+## Understanding Python Projects: pyr
+
+**Before modifying unfamiliar Python code, use `pyr` to understand the structure:**
+
+```bash
+pyr dump                    # Everything: functions, classes, enums
+pyr function                # List all functions with signatures
+pyr class                   # Classes with fields and methods
+pyr module                  # Package/module structure
+
+# Target specific directories
+pyr -t src/ dump
+pyr -t tests/ function test  # Find test functions
+```
+
+`pyr` outputs structured YAML/JSON with function signatures and line numbers — much more efficient than reading every file. Use it to get context before making changes.
+
 ## Package Manager: uv
 
 **Always use `uv` instead of pip, poetry, or pipenv.**

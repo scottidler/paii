@@ -1,0 +1,29 @@
+[plugin]
+name = "git-tools"
+version = "0.1.0"
+description = "Scott's Rust-based git productivity tools: clone, reposlug, ls-*, and more"
+authors = ["Scott Idler <scott.a.idler@gmail.com>"]
+language = "rust"
+type = "skill"
+license = "MIT"
+tags = ["git", "github", "productivity", "cli", "sre"]
+
+[paii]
+core_version = ">=0.1.0"
+
+[provides]
+
+[consumes]
+
+[config]
+
+[hooks]
+pre_tool_use = false
+post_tool_use = false
+stop = false
+session_start = false
+session_end = false
+
+[build]
+type = "skill" # Pure skill plugin, no build needed
+

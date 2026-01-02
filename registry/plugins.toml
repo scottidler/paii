@@ -61,3 +61,13 @@ language = "mixed"
 type = "skill"
 tags = ["python", "coding", "conventions", "uv", "ruff"]
 
+[[plugins]]
+name = "git-tools"
+version = "0.1.0"
+description = "Scott's git productivity tools: clone, reposlug, ls-owners, ls-stale-branches, etc."
+source = "https://github.com/scottidler/paii"
+path = "plugins/git-tools"
+language = "rust"
+type = "skill"
+tags = ["git", "github", "productivity", "sre"]
+
