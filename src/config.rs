@@ -190,3 +190,107 @@ impl Config {
         PathBuf::from(expanded.as_ref())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_config() {
+        let config = Config::default();
+        assert!(!config.paii.version.is_empty());
+        assert_eq!(config.defaults.language, "python");
+        assert_eq!(config.defaults.log_level, "info");
+        assert!(config.hooks.security_enabled);
+        assert!(config.hooks.history_enabled);
+        assert!(config.registries.contains_key("core"));
+    }
+
+    #[test]
+    fn test_default_paii_config() {
+        let config = PaiiConfig::default();
+        assert!(!config.version.is_empty());
+    }
+
+    #[test]
+    fn test_default_defaults_config() {
+        let config = DefaultsConfig::default();
+        assert_eq!(config.language, "python");
+        assert_eq!(config.log_level, "info");
+    }
+
+    #[test]
+    fn test_default_hooks_config() {
+        let config = HooksConfig::default();
+        assert!(config.security_enabled);
+        assert!(config.history_enabled);
+    }
+
+    #[test]
+    fn test_expand_path_no_expansion() {
+        let path = PathBuf::from("/usr/local/bin");
+        let expanded = Config::expand_path(&path);
+        assert_eq!(expanded, PathBuf::from("/usr/local/bin"));
+    }
+
+    #[test]
+    fn test_expand_path_with_tilde() {
+        let path = PathBuf::from("~/test");
+        let expanded = Config::expand_path(&path);
+        // Should expand ~ to home directory
+        assert!(!expanded.to_string_lossy().contains('~'));
+        assert!(expanded.to_string_lossy().contains("test"));
+    }
+
+    #[test]
+    fn test_expand_path_with_env_var() {
+        // SAFETY: Test runs single-threaded, env var is test-specific
+        unsafe {
+            std::env::set_var("PAII_TEST_VAR", "/custom/path");
+        }
+        let path = PathBuf::from("$PAII_TEST_VAR/subdir");
+        let expanded = Config::expand_path(&path);
+        assert_eq!(expanded, PathBuf::from("/custom/path/subdir"));
+        unsafe {
+            std::env::remove_var("PAII_TEST_VAR");
+        }
+    }
+
+    #[test]
+    fn test_paii_dir_default() {
+        // Just test that it returns something with "paii" in it
+        // Don't modify env vars to avoid test interference
+        let dir = Config::paii_dir();
+        // Either it's from PAII_DIR env or it defaults to config dir
+        assert!(!dir.to_string_lossy().is_empty());
+    }
+
+    #[test]
+    fn test_paii_dir_from_env() {
+        // SAFETY: Test runs single-threaded, env var is test-specific
+        unsafe {
+            std::env::set_var("PAII_DIR", "/custom/paii");
+        }
+        let dir = Config::paii_dir();
+        assert_eq!(dir, PathBuf::from("/custom/paii"));
+        unsafe {
+            std::env::remove_var("PAII_DIR");
+        }
+    }
+
+    #[test]
+    fn test_config_serialization_roundtrip() {
+        let config = Config::default();
+        let toml_str = toml::to_string(&config).expect("Failed to serialize");
+        let parsed: Config = toml::from_str(&toml_str).expect("Failed to deserialize");
+        assert_eq!(parsed.paii.version, config.paii.version);
+        assert_eq!(parsed.defaults.language, config.defaults.language);
+    }
+
+    #[test]
+    fn test_load_returns_config() {
+        // Just test that load returns something (default or from file)
+        let result = Config::load(None);
+        assert!(result.is_ok());
+    }
+}

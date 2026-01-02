@@ -147,4 +147,128 @@ impl PluginManifest {
         let manifest: Self = toml::from_str(&content)?;
         Ok(manifest)
     }
+
+    /// Parse a manifest from TOML string
+    pub fn from_str(content: &str) -> eyre::Result<Self> {
+        let manifest: Self = toml::from_str(content)?;
+        Ok(manifest)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const MINIMAL_MANIFEST: &str = r#"
+[plugin]
+name = "test-plugin"
+version = "0.1.0"
+description = "A test plugin"
+"#;
+
+    const FULL_MANIFEST: &str = r#"
+[plugin]
+name = "full-plugin"
+version = "1.2.3"
+description = "A fully configured plugin"
+authors = ["Test Author <test@example.com>"]
+language = "rust"
+license = "MIT"
+repository = "https://github.com/example/plugin"
+keywords = ["test", "example"]
+
+[paii]
+core_version = ">=0.1.0"
+
+[provides.memory]
+contract = "MemoryProvider"
+service = "sqlite-memory"
+
+[consumes.config]
+contract = "ConfigProvider"
+optional = true
+
+[hooks]
+pre_tool_use = true
+stop = true
+
+[build]
+type = "cargo"
+"#;
+
+    #[test]
+    fn test_parse_minimal_manifest() {
+        let manifest = PluginManifest::from_str(MINIMAL_MANIFEST).unwrap();
+        assert_eq!(manifest.plugin.name, "test-plugin");
+        assert_eq!(manifest.plugin.version, "0.1.0");
+        assert_eq!(manifest.plugin.description, "A test plugin");
+        assert!(manifest.plugin.authors.is_empty());
+    }
+
+    #[test]
+    fn test_parse_full_manifest() {
+        let manifest = PluginManifest::from_str(FULL_MANIFEST).unwrap();
+        assert_eq!(manifest.plugin.name, "full-plugin");
+        assert_eq!(manifest.plugin.version, "1.2.3");
+        assert_eq!(manifest.plugin.authors.len(), 1);
+        assert!(matches!(manifest.plugin.language, PluginLanguage::Rust));
+        assert_eq!(manifest.plugin.license, Some("MIT".to_string()));
+        assert!(manifest.provides.contains_key("memory"));
+        assert!(manifest.consumes.contains_key("config"));
+        assert!(manifest.hooks.pre_tool_use);
+        assert!(manifest.hooks.stop);
+        assert!(!manifest.hooks.post_tool_use);
+        assert!(matches!(manifest.build.r#type, BuildType::Cargo));
+    }
+
+    #[test]
+    fn test_default_plugin_language() {
+        let lang = PluginLanguage::default();
+        assert!(matches!(lang, PluginLanguage::Python));
+    }
+
+    #[test]
+    fn test_default_build_type() {
+        let build = BuildType::default();
+        assert!(matches!(build, BuildType::Uv));
+    }
+
+    #[test]
+    fn test_default_hooks_spec() {
+        let hooks = HooksSpec::default();
+        assert!(!hooks.pre_tool_use);
+        assert!(!hooks.post_tool_use);
+        assert!(!hooks.stop);
+        assert!(!hooks.session_start);
+        assert!(!hooks.session_end);
+    }
+
+    #[test]
+    fn test_consume_spec_optional() {
+        let toml_str = r#"
+[plugin]
+name = "test"
+version = "0.1.0"
+description = "test"
+
+[consumes.optional_dep]
+contract = "SomeContract"
+optional = true
+
+[consumes.required_dep]
+contract = "OtherContract"
+"#;
+        let manifest = PluginManifest::from_str(toml_str).unwrap();
+        assert!(manifest.consumes["optional_dep"].optional);
+        assert!(!manifest.consumes["required_dep"].optional);
+    }
+
+    #[test]
+    fn test_manifest_serialization_roundtrip() {
+        let manifest = PluginManifest::from_str(FULL_MANIFEST).unwrap();
+        let toml_str = toml::to_string(&manifest).unwrap();
+        let reparsed = PluginManifest::from_str(&toml_str).unwrap();
+        assert_eq!(reparsed.plugin.name, manifest.plugin.name);
+        assert_eq!(reparsed.plugin.version, manifest.plugin.version);
+    }
 }

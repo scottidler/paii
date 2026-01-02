@@ -71,3 +71,78 @@ pub trait HookHandler: Send + Sync {
     fn handles(&self, event: HookEvent) -> bool;
     fn handle(&self, event: HookEvent, payload: &serde_json::Value) -> HookResult;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hook_event_from_str_pascal_case() {
+        assert_eq!(HookEvent::from_str("PreToolUse"), Some(HookEvent::PreToolUse));
+        assert_eq!(HookEvent::from_str("PostToolUse"), Some(HookEvent::PostToolUse));
+        assert_eq!(HookEvent::from_str("Stop"), Some(HookEvent::Stop));
+        assert_eq!(HookEvent::from_str("SessionStart"), Some(HookEvent::SessionStart));
+        assert_eq!(HookEvent::from_str("SessionEnd"), Some(HookEvent::SessionEnd));
+    }
+
+    #[test]
+    fn test_hook_event_from_str_lowercase() {
+        assert_eq!(HookEvent::from_str("pretooluse"), Some(HookEvent::PreToolUse));
+        assert_eq!(HookEvent::from_str("posttooluse"), Some(HookEvent::PostToolUse));
+        assert_eq!(HookEvent::from_str("stop"), Some(HookEvent::Stop));
+    }
+
+    #[test]
+    fn test_hook_event_from_str_with_separators() {
+        assert_eq!(HookEvent::from_str("pre-tool-use"), Some(HookEvent::PreToolUse));
+        assert_eq!(HookEvent::from_str("pre_tool_use"), Some(HookEvent::PreToolUse));
+        assert_eq!(HookEvent::from_str("session-start"), Some(HookEvent::SessionStart));
+        assert_eq!(HookEvent::from_str("session_end"), Some(HookEvent::SessionEnd));
+    }
+
+    #[test]
+    fn test_hook_event_from_str_unknown() {
+        assert_eq!(HookEvent::from_str("unknown"), None);
+        assert_eq!(HookEvent::from_str(""), None);
+        assert_eq!(HookEvent::from_str("not-a-hook"), None);
+    }
+
+    #[test]
+    fn test_hook_event_all_variants() {
+        // Ensure all variants are parseable
+        assert!(HookEvent::from_str("SubagentStop").is_some());
+        assert!(HookEvent::from_str("Notification").is_some());
+        assert!(HookEvent::from_str("PermissionRequest").is_some());
+        assert!(HookEvent::from_str("UserPromptSubmit").is_some());
+        assert!(HookEvent::from_str("PreCompact").is_some());
+    }
+
+    #[test]
+    fn test_hook_result_exit_codes() {
+        assert_eq!(HookResult::Allow.exit_code(), 0);
+        assert_eq!(
+            HookResult::Block {
+                message: "blocked".to_string()
+            }
+            .exit_code(),
+            2
+        );
+        assert_eq!(
+            HookResult::Error {
+                message: "error".to_string()
+            }
+            .exit_code(),
+            0
+        );
+    }
+
+    #[test]
+    fn test_hook_event_serialization() {
+        let event = HookEvent::PreToolUse;
+        let json = serde_json::to_string(&event).unwrap();
+        assert_eq!(json, "\"PreToolUse\"");
+
+        let parsed: HookEvent = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed, event);
+    }
+}

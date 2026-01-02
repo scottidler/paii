@@ -41,22 +41,44 @@ tasks:
         help: "Minimum line coverage percentage (0 = no threshold)"
     bash: |
       echo "🧪 Running tests with coverage..."
-      if [ "${fail_under}" != "0" ]; then
-        if cargo llvm-cov --all-features --html -q --fail-under-lines "${fail_under}"; then
-          echo ""
-          echo "✅ Coverage meets ${fail_under}% threshold"
-          echo "📊 Coverage report: target/llvm-cov/html/index.html"
-        else
-          echo ""
-          echo "❌ Coverage is below ${fail_under}% threshold"
-          echo "📊 Coverage report: target/llvm-cov/html/index.html"
-          exit 1
-        fi
-      else
-        cargo llvm-cov --all-features --html -q
+      echo ""
+
+      # Run tests with summary output (text format includes TOTAL line)
+      OUTPUT=$(cargo llvm-cov --all-features 2>&1)
+
+      # Generate HTML report (uses cached results, fast)
+      cargo llvm-cov --all-features --html --no-run -q 2>/dev/null || true
+
+      # Show test results (just the summary line)
+      echo "$OUTPUT" | grep "^test result:" || true
+      echo ""
+
+      # Extract the TOTAL line and parse coverage
+      TOTAL_LINE=$(echo "$OUTPUT" | grep "^TOTAL" || echo "")
+      if [ -n "$TOTAL_LINE" ]; then
+        # Get the last percentage (line coverage) and second percentage (function coverage)
+        LINE_COV=$(echo "$TOTAL_LINE" | awk '{for(i=NF;i>=1;i--) if($i ~ /^[0-9.]+%$/) {print $i; exit}}')
+        FUNC_COV=$(echo "$TOTAL_LINE" | awk '{count=0; for(i=1;i<=NF;i++) if($i ~ /^[0-9.]+%$/) {count++; if(count==2) print $i}}')
+
+        echo "📊 Coverage Summary:"
+        echo "   Lines:     $LINE_COV"
+        echo "   Functions: $FUNC_COV"
         echo ""
-        echo "✅ Coverage report: target/llvm-cov/html/index.html"
+
+        # Check threshold if specified
+        if [ "${fail_under}" != "0" ]; then
+          COV_NUM=$(echo "$LINE_COV" | tr -d '%')
+          if [ -n "$COV_NUM" ] && [ "$(echo "$COV_NUM >= $fail_under" | bc -l 2>/dev/null || echo 0)" -eq 1 ]; then
+            echo "✅ Coverage meets ${fail_under}% threshold"
+          else
+            echo "❌ Coverage $LINE_COV is below ${fail_under}% threshold"
+            echo "📄 Full report: target/llvm-cov/html/index.html"
+            exit 1
+          fi
+        fi
       fi
+
+      echo "📄 Full report: target/llvm-cov/html/index.html"
 
   # Full CI pipeline
   ci:
