@@ -1,5 +1,6 @@
 use colored::*;
-use eyre::Result;
+use eyre::{Context, Result};
+use std::fs;
 
 use crate::cli::ConfigAction;
 use crate::config::Config;
@@ -74,11 +75,41 @@ fn get(key: &str, config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn set(key: &str, value: &str, _config: &Config) -> Result<()> {
+fn set(key: &str, value: &str, config: &Config) -> Result<()> {
     println!("{} Setting {} = {}", "→".blue(), key.cyan(), value.green());
 
-    // TODO: Implement config writing
-    println!("  {} Config writing not yet implemented", "⚠".yellow());
+    // Clone config and modify
+    let mut new_config = config.clone();
+
+    // Update the value based on key
+    match key {
+        "paii.version" => new_config.paii.version = value.to_string(),
+        "paths.plugins" => new_config.paths.plugins = value.into(),
+        "paths.history" => new_config.paths.history = value.into(),
+        "paths.registries" => new_config.paths.registries = value.into(),
+        "defaults.language" => new_config.defaults.language = value.to_string(),
+        "defaults.log_level" => new_config.defaults.log_level = value.to_string(),
+        "hooks.security_enabled" => {
+            new_config.hooks.security_enabled =
+                value.parse().context("Invalid boolean value (use 'true' or 'false')")?;
+        }
+        "hooks.history_enabled" => {
+            new_config.hooks.history_enabled =
+                value.parse().context("Invalid boolean value (use 'true' or 'false')")?;
+        }
+        _ => {
+            eyre::bail!("Unknown config key: {}", key);
+        }
+    }
+
+    // Write config to file
+    let config_path = Config::paii_dir().join("paii.toml");
+    fs::create_dir_all(config_path.parent().unwrap())?;
+
+    let toml_str = toml::to_string_pretty(&new_config).context("Failed to serialize config")?;
+    fs::write(&config_path, toml_str).context("Failed to write config file")?;
+
+    println!("  {} Saved to {}", "✓".green(), config_path.display());
 
     Ok(())
 }
