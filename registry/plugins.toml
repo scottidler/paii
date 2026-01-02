@@ -1,0 +1,31 @@
+# PAII Core Plugin Registry
+# This file lists available plugins for discovery
+
+[registry]
+name = "paii-core"
+description = "Core PAII plugins and examples"
+version = "0.1.0"
+maintainer = "scottidler"
+
+# Example plugins included in the paii repo
+
+[[plugins]]
+name = "hello-world"
+version = "0.1.0"
+description = "Example Python plugin demonstrating the plugin system"
+source = "https://github.com/scottidler/paii"
+path = "examples/hello-world"
+language = "python"
+type = "skill"
+tags = ["example", "starter"]
+
+[[plugins]]
+name = "hello-rust"
+version = "0.1.0"
+description = "Example Rust plugin demonstrating the plugin system"
+source = "https://github.com/scottidler/paii"
+path = "examples/hello-rust"
+language = "rust"
+type = "skill"
+tags = ["example", "starter"]
+

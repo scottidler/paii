@@ -128,13 +128,43 @@ fn update(name: Option<&str>, config: &Config) -> Result<()> {
             } else {
                 println!("  {} Local file not found: {}", "✗".red(), path);
             }
+        } else if url.starts_with("http://") || url.starts_with("https://") {
+            // Remote URL - fetch with ureq
+            match fetch_remote_registry(url) {
+                Ok(content) => {
+                    let cache_file = registries_dir.join(format!("{}.toml", reg_name));
+                    fs::write(&cache_file, &content).context("Failed to cache registry")?;
+                    println!("  {} Fetched and cached", "✓".green());
+                }
+                Err(e) => {
+                    println!("  {} Failed to fetch: {}", "✗".red(), e);
+                }
+            }
         } else {
-            // Remote URL - would need HTTP client (reqwest, ureq, etc.)
-            println!("  {} Remote fetching not implemented yet", "⚠".yellow());
-            println!("    URL: {}", url.dimmed());
-            println!("    {} Add 'reqwest' or 'ureq' crate for HTTP support", "ℹ".blue());
+            println!("  {} Unknown URL scheme: {}", "✗".red(), url);
         }
     }
 
     Ok(())
+}
+
+/// Fetch a registry from a remote URL
+fn fetch_remote_registry(url: &str) -> Result<String> {
+    log::info!("Fetching registry from: {}", url);
+
+    let response = ureq::get(url)
+        .header("User-Agent", "paii/0.1.0")
+        .call()
+        .context("HTTP request failed")?;
+
+    if response.status() != 200 {
+        eyre::bail!("HTTP {} error", response.status());
+    }
+
+    let body = response
+        .into_body()
+        .read_to_string()
+        .context("Failed to read response body")?;
+
+    Ok(body)
 }

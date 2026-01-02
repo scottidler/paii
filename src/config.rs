@@ -59,7 +59,7 @@ impl Default for Config {
             defaults: DefaultsConfig::default(),
             registries: HashMap::from([(
                 "core".to_string(),
-                "https://github.com/scottidler/paii/registry/plugins.toml".to_string(),
+                "https://raw.githubusercontent.com/scottidler/paii/main/registry/plugins.toml".to_string(),
             )]),
             hooks: HooksConfig::default(),
         }
