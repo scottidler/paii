@@ -29,3 +29,15 @@ language = "rust"
 type = "skill"
 tags = ["example", "starter"]
 
+# Real skills
+
+[[plugins]]
+name = "rust-coder"
+version = "0.1.0"
+description = "Rust coding conventions and scaffolding - teaches Claude Scott's Rust patterns"
+source = "https://github.com/scottidler/paii"
+path = "plugins/rust-coder"
+language = "mixed"
+type = "skill"
+tags = ["rust", "coding", "conventions", "cli"]
+

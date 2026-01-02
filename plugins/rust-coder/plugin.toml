@@ -1,0 +1,30 @@
+[plugin]
+name = "rust-coder"
+version = "0.1.0"
+description = "Rust coding conventions and scaffolding for Scott's workflow"
+authors = ["Scott Idler <scott.a.idler@gmail.com>"]
+language = "mixed"
+license = "MIT"
+
+[paii]
+core_version = ">=0.1.0"
+
+[provides]
+# This plugin provides a Claude Code skill
+
+[consumes]
+# No dependencies on other plugins
+
+[config]
+# No config needed - this is a pure skill plugin
+
+[hooks]
+pre_tool_use = false
+post_tool_use = false
+stop = false
+session_start = false
+session_end = false
+
+[build]
+type = "custom"
+
