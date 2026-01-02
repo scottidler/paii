@@ -208,3 +208,6 @@ __marimo__/
 
 # ignore symlink
 Personal_AI_Infrastructure
+
+# PAII specific
+.claude/settings.json
